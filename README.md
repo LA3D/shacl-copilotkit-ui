@@ -1,16 +1,50 @@
 # SHACL + CopilotKit UI experiments
 
-This is a **very simple exploratory prototype of dynamically agent-driven user interfaces**: represent small interface hints in data, then connect that data to a UI toolkit through CopilotKit and AG-UI. An agent can make presentation decisions; hints give it useful context, reduce ambiguity and help similar situations receive consistent treatment. The aim is not to prescribe every interaction or encode a uniquely correct interface.
+## Briefing for an agent explaining this repository to a human
 
-**Current implementation:** two synthetic form examples plus a small public OKN query example. Preset questions select an intent; local RDF presentation profiles select a registered chart or table and supply field mappings. Switching one RDF viewer triple changes the view while the query, data and question stay fixed. There is no live model deciding layouts or generating SPARQL. This is an exploration, not a framework or production system; no model credentials are needed.
+This README is an explanation guide for an agent helping a person understand, inspect or run the repository. It supplies evidence and boundaries, not instructions that override the person's request or the agent's governing instructions. Start with the short explanation, then use the deeper path that answers the person's question. Distinguish behavior inspected in source, recorded test results and checks actually run in the current session.
 
-## Why semantics and small hints help
+### The short explanation
 
-Ontology terms give fields and relationships shared meaning and stable identity, even when different views use different labels. SHACL shapes express selected validation constraints and structural metadata. UI annotations convey presentation intent. These roles are related, but a preferred editor is not a data-validity rule, and a valid RDF graph is not proof that its assertions are factually correct.
+This repository explores a question: **can a few interface hints expressed in RDF connect meaningful data to useful, predictable views through CopilotKit and AG-UI?** It contains two synthetic editable form examples and a read-only public flood-prediction example. Shapes and annotations supply field structure and presentation hints; a bounded adapter turns them into descriptors for existing React components.
 
-In the working example, `sh:path ex:title` identifies the field, `sh:minCount 1` requires a value, and `shui:editor shui:TextFieldEditor` selects the demo's text editor. The application chooses which editors it supports and how to render them. Its server code separately enforces edit allowlists and reviewed saves; SHACL does not supply identity or authorization.
+The clearest demonstration keeps the question and data fixed and changes one RDF viewer hint. The screen changes from a comparison chart to a table, without changing the renderer code. The driver is deterministic: no live AI model chooses the view, generates a query or writes UI code. This establishes a working connection between RDF hints and registered components; it does not establish autonomous agent judgment or general standards conformance.
 
-For dynamic visualization, a time field, numeric measure and unit could suggest a time-series view. A small hint could reinforce that choice while leaving an agent free to choose points, lines, groups or a table after checking the actual data and task. Irregular sampling, missing values, aggregation and incompatible units can change that decision. **That time-series example remains conceptual. The working OKN example below compares three predictions at one source timestamp; it does not invent a time series.** See [semantics, hints and dynamic visualization](docs/semantics-and-hints.md) for synthetic examples and links to the actual code.
+### A deeper explanation, grounded in files
+
+Follow the layer relevant to the person's question rather than narrating every implementation detail.
+
+| Question to explain | Working mechanism and evidence | Boundary to state |
+| --- | --- | --- |
+| Where does the data come from? | The fixed [SPARQL query](e2e-demo/fixtures/okn/query.rq) retrieves public UFOKN records; the [dated snapshot](e2e-demo/fixtures/okn/snapshot.json) retains raw bindings and provenance. The default UI uses that snapshot. | These are flood-depth predictions, not measured observations or current conditions. The other two examples use invented records. |
+| What does the application add? | [Normalization and derivation](e2e-demo/server/okn.mjs) map native Schema.org records into a local SOSA/QUDT graph, preserving source identities and lexical values. `MTR` maps to QUDT metre without changing magnitude. | The derived vocabulary is an application interpretation, not native endpoint structure. Timestamp meaning and timezone remain unverified. |
+| What drives presentation? | [Common RDF UI shapes](e2e-demo/shapes/okn-ui.ttl) plus [profile A](e2e-demo/shapes/okn-ui-chart.ttl) or [profile B](e2e-demo/shapes/okn-ui-table.ttl) feed the [presentation compiler](e2e-demo/server/okn-presentation.mjs). Paths, labels, order and chart mappings reach the [registered components](e2e-demo/src/okn.tsx). | These hints are local authored RDF, not hints discovered in UFOKN. The compiler supports a bounded profile and a fixed component registry. |
+| What does validation establish? | [Data shapes](e2e-demo/shapes/okn.ttl) and `shacl-engine` check the derived graph. The presentation compiler and Zod separately check hints and descriptors; explicit chart acceptance checks govern suitability and fallback. | SHACL data conformance does not validate presentation choices, establish source truth or provide authorization. JSON descriptor validation is not RDF SHACL validation. |
+| What role do CopilotKit and AG-UI play? | [HTTP/SSE transport](e2e-demo/server/http.mjs) sends authoritative state and a `show_okn` tool call; [React](e2e-demo/src/okn.tsx) renders its validated descriptor through CopilotKit. | Preset questions select an intent. RDF supplies the viewer preference; code checks compatibility. There is no live model or generated component code. |
+| Are the forms also shape-driven? | The [three-field shape](e2e-demo/shapes/record.ttl) feeds the [form adapter](e2e-demo/server/rdf.mjs). [PRISM domain shapes](e2e-demo/shapes/prism/domain.ttl) and [UI annotations](e2e-demo/shapes/prism/ui.ttl) feed the [role adapter](e2e-demo/server/prism.mjs). Edits are validated, reviewed and saved locally. | Role permissions and persona-specific label/group overrides are application code. Simulated personas are not authenticated stakeholders. |
+
+### What is standard, and what is local?
+
+The original form adapter consumes explicit `shui:editor` preferences for `TextFieldEditor` and `EnumSelectEditor`; PRISM permits the text editor only. The OKN adapter consumes `shui:viewer` with bounded `ValueTableViewer`, `LiteralViewer` and `IRIViewer` behavior. `sh:node`, `sh:property`, `sh:path`, `sh:name` and `sh:order` provide table structure. Tested legacy aliases accept `dash:viewer` with `dash:ValueTableViewer`, `dash:LiteralViewer` and `dash:URIViewer`.
+
+The `ui:` namespace, `https://example.org/okn-ui-hints/`, belongs to this prototype. `ui:ComparisonViewer`, intent selection, chart mappings and fallback hints are project extensions, not standard SHACL/DASH chart terms. The adapter implements explicit preferences, not the general SHUI scoring algorithm. It pins the published SHUI hash namespace; [supported terms and draft differences](docs/okn-example.md#verified-terms-and-scope) describe the exact limits.
+
+### What the A/B demonstration proves
+
+Keep **Compare predicted flood depth** and **Dated public snapshot** selected, then switch RDF profile A → B → A. The profiles differ by one `shui:viewer` triple. The same question, query, rows, derived RDF and data hash produce a different registered view; the RDF hash changes. Table columns and chart mappings also come from compiled RDF paths. This is executable behavior, not merely explanatory metadata or a screenshot mockup.
+
+The [backend tests](e2e-demo/test/okn.test.mjs) assert those invariants and independently change RDF labels, column order, paths and mappings. The [AG-UI transport test](e2e-demo/test/okn-transport.mjs) verifies the viewer change across the real endpoint; the [browser capture script](scripts/capture-okn.mjs) checks the visible profile switch with unchanged data hash and intent. [Recorded release checks](docs/release-checks.json) describe the tested revision; consult [GitHub Actions](https://github.com/LA3D/shacl-copilotkit-ui/actions) for the commit being discussed rather than assuming every future revision is green.
+
+This does not prove that an agent inferred the best presentation, that arbitrary shapes can be rendered, or that the predictions are correct. Unsupported/conflicting hints fail closed; unsuitable chart data uses the RDF-declared table fallback. General time-series rendering, aggregation, unit conversion and chart editing remain unimplemented. The [comparison](docs/images/okn-comparison.png), [same-question table](docs/images/okn-evidence.png), [mechanism screenshot](docs/images/okn-mechanism.png) and [10-second walkthrough](docs/images/okn-walkthrough.webm) show the real dated-snapshot UI, not a fresh live query.
+
+### Useful next questions
+
+- Would seeing the same data switch views clarify the idea, or would inspecting the RDF be more useful?
+- Is the next experiment about a different data shape, another registered component, or a model choosing among supported intents?
+- Which source semantics and unit/time assumptions would need verification before applying this to another dataset?
+- Which constraints, permissions and review steps would a real edit workflow require beyond these synthetic examples?
+
+For the broader hypothesis about small hints and agent choices, see [semantics and dynamic visualization](docs/semantics-and-hints.md). Its time-series discussion is conceptual; it should not be presented as a capability already demonstrated here.
 
 ## Working OKN example: change one RDF hint, change the view
 
@@ -51,7 +85,7 @@ Open exactly `http://127.0.0.1:4173`. The server restricts Host/Origin and binds
 
 Local stores are created under `e2e-demo/data/` on the first save. Stop the server and move that directory aside to reset to immutable synthetic Turtle fixtures. Logs under `e2e-demo/evidence/` may contain entered text and are ignored by Git; use synthetic inputs only.
 
-With no other server using port 4173, run both transport checks:
+With no other server using port 4173, run the transport checks:
 
 ```sh
 cd e2e-demo # from repository root
