@@ -1,6 +1,6 @@
 # Support and reproducibility
 
-This is a small exploration of data-carried interface hints, not a general UI framework. The current scripted driver and explicit editor mapping do not demonstrate autonomous presentation selection. The time-series discussion in [semantics-and-hints.md](semantics-and-hints.md) is conceptual and adds no chart capability.
+This is a small exploration of data-carried interface hints, not a general UI framework. The current scripted driver and explicit editor mapping do not demonstrate autonomous presentation selection. The time-series discussion in [semantics-and-hints.md](semantics-and-hints.md) remains conceptual. The [OKN extension](okn-example.md) implements a categorical comparison chart and evidence table, selected by scripted questions.
 
 ## Local release checks (2026-10-12)
 
@@ -31,4 +31,4 @@ A separate limitation recorded in the original demo is sequence-form `shnex:path
 
 The original UI supports one string and two IRI fields; the role extension supports bounded string edits on distinct focus nodes. Shape and field identities remain stable, and hidden RDF terms survive edits. There is no general multivalue UI, arbitrary complex editable path, scoring-based widget selection, DASH/A2UI renderer or full SHUI implementation.
 
-No live model, production ontology closure validation, medical inference, authenticated stakeholder policy, load/security audit, browser matrix or physical mobile-device testing is included. Prior screenshots/PDFs are deliberately not reproduced as current verification evidence. This release check reruns backend/build/transport checks, not the historical browser interaction session.
+No live model, production ontology closure validation, medical inference, authenticated stakeholder policy, load/security audit, browser matrix or physical mobile-device testing is included. Prior screenshots/PDFs are deliberately not reproduced as current verification evidence. The original release check reran backend/build/transport checks, not the historical form browser session. The OKN extension has a separate current browser check and genuine public-data screenshots/recording; see [okn-example.md](okn-example.md).

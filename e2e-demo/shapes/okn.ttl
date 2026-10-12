@@ -1,0 +1,16 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix demo: <https://example.org/okn-ui/> .
+# Local constraints on our derived view; no claim of full SOSA conformance.
+demo:PredictionShape a sh:NodeShape ; sh:targetClass demo:DerivedPredictionView ;
+  sh:property [ sh:path sosa:hasFeatureOfInterest ; sh:nodeKind sh:IRI ; sh:minCount 1 ; sh:maxCount 1 ],
+    [ sh:path sosa:hasResult ; sh:nodeKind sh:IRI ; sh:minCount 1 ; sh:maxCount 1 ],
+    [ sh:path prov:wasDerivedFrom ; sh:nodeKind sh:IRI ; sh:minCount 1 ; sh:maxCount 1 ],
+    [ sh:path demo:sourceTimestamp ; sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ] .
+demo:QuantityShape a sh:NodeShape ; sh:targetClass qudt:QuantityValue ;
+  sh:property [ sh:path qudt:numericValue ; sh:datatype xsd:decimal ; sh:minCount 1 ; sh:maxCount 1 ; sh:minInclusive 0 ],
+    [ sh:path qudt:unit ; sh:in (unit:M) ; sh:minCount 1 ; sh:maxCount 1 ] .

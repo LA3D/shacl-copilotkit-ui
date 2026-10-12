@@ -7,6 +7,7 @@ import { RunAgentInputSchema, EventSchemas } from '@ag-ui/core/schemas';
 import { loadProfile } from './rdf.mjs';
 import { createService } from './service.mjs';
 import { loadPrism, createPrismService } from './prism.mjs';
+import { createOknService } from './okn.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const port = Number(process.env.DEMO_PORT ?? 4173);
@@ -14,6 +15,7 @@ if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error('Inv
 const host = `127.0.0.1:${port}`, origin = `http://${host}`;
 const profile = await loadProfile();
 const service = await createService(profile, path.join(root, 'data/demo-store.json'));
+const oknService = createOknService();
 const prismService = await createPrismService(await loadPrism(), path.join(root, 'data/prism-store.json'));
 await fs.mkdir(path.join(root, 'evidence/prism'), { recursive: true });
 const json = (res, code, obj) => { res.writeHead(code, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(obj)); };
@@ -24,7 +26,8 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && url.pathname === '/api/bootstrap') return json(res, 200, service.bootstrap());
     const prismRoute = /^\/api\/prism\/(command|medical)\/(bootstrap|agent)$/.exec(url.pathname);
     if (req.method === 'GET' && prismRoute?.[2] === 'bootstrap') return json(res, 200, prismService.bootstrap(prismRoute[1]));
-    if (req.method === 'POST' && (url.pathname === '/api/agent' || prismRoute?.[2] === 'agent')) {
+    const oknRoute = url.pathname === '/api/okn/agent';
+    if (req.method === 'POST' && (url.pathname === '/api/agent' || prismRoute?.[2] === 'agent' || oknRoute)) {
       if (req.headers.origin && req.headers.origin !== origin) return json(res, 403, { error: 'Cross-origin writes rejected' });
       if (!req.headers['content-type']?.startsWith('application/json')) return json(res, 415, { error: 'JSON required' });
       const chunks = []; let size = 0;
@@ -35,21 +38,22 @@ const server = http.createServer(async (req, res) => {
       const emit = event => { EventSchemas.parse(event); events.push(event); res.write(`data: ${JSON.stringify(event)}\n\n`); };
       emit({ type: 'RUN_STARTED', threadId: input.threadId, runId: input.runId, protocolVersion: '1.0' });
       try {
-        const state = prismRoute ? await prismService.run(prismRoute[1], input, input.threadId) : await service.run(input, input.threadId);
+        const state = oknRoute ? await oknService.run(input) : prismRoute ? await prismService.run(prismRoute[1], input, input.threadId) : await service.run(input, input.threadId);
         if (input.forwardedProps?.command === 'propose') {
           // Actual RFC 6902 state patches consumed by HttpAgent, not simulated UI callbacks.
           emit({ type: 'STATE_DELTA', delta: Object.entries(state).map(([key, value]) => ({ op: 'add', path: '/' + key, value })) });
         } else emit({ type: 'STATE_SNAPSHOT', snapshot: state });
-        if (input.forwardedProps?.command === 'open') {
+        if (oknRoute || input.forwardedProps?.command === 'open') {
           const toolCallId = randomUUID();
-          emit({ type: 'TOOL_CALL_START', toolCallId, toolCallName: prismRoute ? 'show_prism' : 'show_record' });
-          emit({ type: 'TOOL_CALL_ARGS', toolCallId, delta: JSON.stringify({ descriptorId: state.descriptor.id }) });
+          emit({ type: 'TOOL_CALL_START', toolCallId, toolCallName: oknRoute ? 'show_okn' : prismRoute ? 'show_prism' : 'show_record' });
+          emit({ type: 'TOOL_CALL_ARGS', toolCallId, delta: JSON.stringify(oknRoute ? state.view : { descriptorId: state.descriptor.id }) });
           emit({ type: 'TOOL_CALL_END', toolCallId });
-          emit({ type: 'TOOL_CALL_RESULT', toolCallId, messageId: randomUUID(), role: 'tool', content: 'Trusted form ready' });
+          emit({ type: 'TOOL_CALL_RESULT', toolCallId, messageId: randomUUID(), role: 'tool', content: oknRoute ? 'Validated read-only view ready' : 'Trusted form ready' });
         }
         emit({ type: 'RUN_FINISHED', threadId: input.threadId, runId: input.runId });
       } catch (error) { emit({ type: 'RUN_ERROR', message: error.message, code: 'DEMO_REJECTED' }); }
       res.end();
+      if (oknRoute) return; // Public results are read-only; no per-request record or client state log.
       await fs.appendFile(path.join(root, prismRoute ? 'evidence/prism/transport.ndjson' : 'evidence/transport.ndjson'), JSON.stringify({ at: new Date().toISOString(), persona: prismRoute?.[1],
         command: input.forwardedProps?.command, runId: input.runId, ...(prismRoute ? {} : { draft: input.state?.draft }),
         events }) + '\n');

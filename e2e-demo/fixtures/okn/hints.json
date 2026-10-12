@@ -1,0 +1,9 @@
+{
+  "namespace": "https://example.org/okn-ui-hints/",
+  "preferredView": "comparison",
+  "categoryField": "feature",
+  "quantityField": "depth",
+  "unit": "http://qudt.org/vocab/unit/M",
+  "evidenceView": "table",
+  "note": "Prototype-owned presentation hints, not SHACL constraints or a standard chart vocabulary."
+}

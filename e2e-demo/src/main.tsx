@@ -7,6 +7,7 @@ import { z } from 'zod';
 import type { DemoState, Field } from './types';
 import './style.css';
 import { bootPrism } from './prism';
+import { bootOkn } from './okn';
 
 type Actions = { run: (command: string, extra?: Record<string, string>) => Promise<void>; busy: boolean; edit: (field: Field, value: string) => void };
 const ActionsContext = createContext<Actions | null>(null);
@@ -109,4 +110,5 @@ async function boot() {
   const agent = new HttpAgent({ agentId: 'default', url: location.origin + '/api/agent', initialState: state });
   createRoot(document.getElementById('root')!).render(<CopilotKitProvider agents__unsafe_dev_only={{ default: agent }} enableInspector={false} showIntelligenceIndicator={false}><Demo /></CopilotKitProvider>);
 }
-void (new URLSearchParams(location.search).get('view') === 'prism' ? bootPrism() : boot()).catch(error => { document.getElementById('root')!.textContent = String(error); });
+const route = new URLSearchParams(location.search).get('view');
+void (route === 'okn' ? bootOkn() : route === 'prism' ? bootPrism() : boot()).catch(error => { document.getElementById('root')!.textContent = String(error); });

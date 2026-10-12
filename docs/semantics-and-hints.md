@@ -2,7 +2,7 @@
 
 The question behind this small experiment is: can an agent use meaning and a few interface hints carried with data to build a useful interaction through an existing UI toolkit? An agent is capable of choosing a presentation. Hints can spare it repeated guesswork about what a field represents or which interaction is usually useful, without attempting to specify every screen or conversation.
 
-The present code tests a narrow part of that idea: scripted proposals, explicit form editor annotations, registered React components and a validated edit round trip. It does not test a live agent's ability to choose a layout, infer user intent or select a chart. Those are exploratory directions, not shipped features.
+The present code tests a narrow part of that idea: scripted proposals, explicit form editor annotations, registered React components and a validated edit round trip. The [working OKN extension](okn-example.md) adds a bounded public query and a scripted comparison-chart/table choice from presentation hints and result checks. It does not test a live agent's ability to choose a layout, infer user intent or select a chart. Those are exploratory directions, not shipped features.
 
 ## Six distinct roles
 
@@ -49,7 +49,7 @@ After an edit, the UI sends typed RDF terms in shared state on the next AG-UI re
 
 Neither vocabulary annotations nor validation establish that an observation is true, authorize disclosure, or determine a uniquely correct visualization. Source quality, permissions, task context and rendering choices need their own checks.
 
-## Conceptual time-series example — no chart implementation
+## Conceptual time-series example — no time-series implementation
 
 Consider three synthetic temperature observations, with a gap in the last reading. This standalone illustrative Turtle is not loaded by the current form compiler. All `ex:*` domain terms and `hint:*` hints here are invented for explanation; no chart-hint standard is claimed.
 
@@ -80,6 +80,6 @@ The semantics distinguish observation time, measured value, unit and sensor iden
 - **Units and groups:** verify compatible units before combining readings; convert explicitly or separate series. Grouping by sensor can avoid conflating measurements. A unit IRI names a unit but does not perform conversion.
 - **Uncertainty:** if supplied, distinguish an interval, standard deviation or measurement tolerance before selecting error bars or a band. A generic uncertainty label does not supply that interpretation.
 
-A capable agent might choose a scatter plot, a line with explicit gaps, separate panels or a table. Small hints narrow plausible options and make decisions more consistent; they remain guidance rather than proof. A future edit interaction would map changed values back to observations and run declared constraints plus application review/policy checks, just as the existing forms do. Chart rendering, aggregation, conversion and chart edit readback are **not implemented here**.
+A capable agent might choose a scatter plot, a line with explicit gaps, separate panels or a table. Small hints narrow plausible options and make decisions more consistent; they remain guidance rather than proof. A future edit interaction would map changed values back to observations and run declared constraints plus application review/policy checks, just as the existing forms do. The working OKN extension renders a categorical comparison chart; time-series rendering, aggregation, magnitude conversion and chart edit readback are **not implemented here**.
 
 The useful separation is: meaning tells us what the data says; validation tests selected requirements; hints suggest presentation; the agent/application chooses; components render; edits return through validation and review. None of these layers substitutes for all the others.

@@ -2,7 +2,7 @@
 
 This is a **very simple exploratory prototype of dynamically agent-driven user interfaces**: represent small interface hints in data, then connect that data to a UI toolkit through CopilotKit and AG-UI. An agent can make presentation decisions; hints give it useful context, reduce ambiguity and help similar situations receive consistent treatment. The aim is not to prescribe every interaction or encode a uniquely correct interface.
 
-**Current implementation:** two synthetic form examples with a deterministic scripted driver, explicit editor choices and approved React components. There is no live model deciding layouts and no implemented chart renderer. The code explores the plumbing for the broader idea; it is not a framework or production system. No model credentials are needed.
+**Current implementation:** two synthetic form examples plus a small public OKN query example. Two preset questions select a comparison chart or evidence table through a deterministic driver and registered React components. There is no live model deciding layouts or generating SPARQL. This is an exploration, not a framework or production system; no model credentials are needed.
 
 ## Why semantics and small hints help
 
@@ -10,7 +10,23 @@ Ontology terms give fields and relationships shared meaning and stable identity,
 
 In the working example, `sh:path ex:title` identifies the field, `sh:minCount 1` requires a value, and `shui:editor shui:TextFieldEditor` selects the demo's text editor. The application chooses which editors it supports and how to render them. Its server code separately enforces edit allowlists and reviewed saves; SHACL does not supply identity or authorization.
 
-For dynamic visualization, a time field, numeric measure and unit could suggest a time-series view. A small hint could reinforce that choice while leaving an agent free to choose points, lines, groups or a table after checking the actual data and task. Irregular sampling, missing values, aggregation and incompatible units can change that decision. **This chart example is conceptual; this repository currently implements forms only.** See [semantics, hints and dynamic visualization](docs/semantics-and-hints.md) for synthetic examples and links to the actual code.
+For dynamic visualization, a time field, numeric measure and unit could suggest a time-series view. A small hint could reinforce that choice while leaving an agent free to choose points, lines, groups or a table after checking the actual data and task. Irregular sampling, missing values, aggregation and incompatible units can change that decision. **That time-series example remains conceptual. The working OKN example below compares three predictions at one source timestamp; it does not invent a time series.** See [semantics, hints and dynamic visualization](docs/semantics-and-hints.md) for synthetic examples and links to the actual code.
+
+## Working OKN example: change the question, change the view
+
+Run the demo and open `http://127.0.0.1:4173/?view=okn`. The initial view uses a **dated public snapshot**, labeled in the UI. Select **Query OKN endpoint** to execute the fixed, bounded read-only SPARQL query from the local server. An endpoint failure displays an explicit dated fallback; empty live results stay empty.
+
+**“Compare predicted flood depth” → comparison chart.** Source data, semantic mapping and small presentation hints support a scripted view choice. Three features at one source time call for a comparison, not a temporal line.
+
+![Working OKN comparison view using a labeled public snapshot](docs/images/okn-comparison.png)
+
+**“Show supporting records & units” → evidence table.** The same records retain their identities and values while the representation changes. This is real UI behavior, not a mockup or autonomous model demonstration.
+
+![Working evidence table after changing the preset question](docs/images/okn-evidence.png)
+
+[Watch the 10-second genuine UI recording](docs/images/okn-walkthrough.webm) · [Inspect the mechanism screenshot](docs/images/okn-mechanism.png) · [Query, mapping, tests and limits](docs/okn-example.md)
+
+The source graph uses Schema.org, with a QUDT quantity-kind URL stored as a literal. **SOSA/QUDT structure is our explicit derived view**, not a claim about native endpoint vocabulary. `MTR` maps to QUDT metre without a magnitude conversion. Values describe predictions, not measured flood observations. Source timestamp meaning and timezone remain unverified. The screenshots and recording show the public snapshot retrieved on 2026-10-12; they do not imply a live endpoint result.
 
 ## Run
 
@@ -29,6 +45,7 @@ npm start
 
 Open exactly `http://127.0.0.1:4173`. The server restricts Host/Origin and binds to loopback. Stop it with Ctrl-C. No hosted service is supplied.
 
+- `/?view=okn`: public SPARQL result → derived SOSA/QUDT graph → scripted comparison/table selection.
 - `/`: propose a synthetic record edit, invalidate a required title or catalog-dependent option, correct it, review the exact change and confirm a local save.
 - `/?view=prism&persona=command`: compare Unit command and Embedded medical presentations of the same invented graph. Each simulated role has its own read/write projection.
 
@@ -47,6 +64,7 @@ The runner starts and stops its own server. Existing service tests use temporary
 
 | Implemented in this repository | Design only / excluded |
 | --- | --- |
+| One fixed public UFOKN query, dated fallback, derived SOSA/QUDT graph, safe comparison/table specs | Arbitrary queries, live model selection, time-series rendering or chart editing |
 | Stable shape IDs, direct predicate paths, grouped/ordered fields, explicit SHUI editor annotations | General SHUI conformance, scoring-based editor discovery, arbitrary shapes |
 | CopilotKit registered tool rendering, AG-UI SSE snapshots and RFC 6902 state deltas | Live LLM, production CopilotKit runtime integration, DASH/A2UI renderer |
 | RDF term preservation, candidate-graph validation, field-routed errors | Full SHACL 1.2 coverage, Rules execution, general node expressions |
@@ -62,7 +80,7 @@ Trusted local Turtle → bounded descriptor/compiler → approved React fields. 
 
 Human edits are local until sent on an AG-UI request. The server assembles a candidate RDF graph, validates it with the pinned experimental `shacl-engine`, and returns field feedback. Review binds the exact draft to a thread and current record/catalog revisions. Save requires that review plus fresh validation. The server writes a temporary JSON file and renames it; proposals and reviews do not save records. The role-view extension separates domain shapes, presentation annotations and illustrative server policies.
 
-- `e2e-demo/src/`: two working UI examples and approved React renderers.
+- `e2e-demo/src/`: working form, comparison-chart and evidence-table examples with registered React renderers.
 - `e2e-demo/server/`: HTTP/SSE transport, profile compilation, validation and save workflow.
 - `e2e-demo/shapes/`: synthetic examples and bounded constraints.
 - `e2e-demo/test/`: original backend and transport checks plus an automated server runner.

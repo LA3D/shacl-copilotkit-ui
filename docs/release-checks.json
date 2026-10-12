@@ -33,5 +33,19 @@
     ]
   },
   "browser_verification": "Not rerun in release preparation; historical screenshots excluded",
-  "remote_ci": "See GitHub Actions for checks on the published commit; local results above are independent."
+  "remote_ci": "See GitHub Actions for checks on the published commit; local results above are independent.",
+  "okn_extension": {
+    "checked_at": "2026-10-12",
+    "backend_tests": {
+      "passed": 31,
+      "failed": 0
+    },
+    "typecheck": "passed",
+    "lint": "passed",
+    "build": "passed with existing warnings",
+    "transport": "14 existing checks plus OKN snapshot/switch/spec/repeat/origin checks passed",
+    "browser": "chart, table, inspector, repeat, 390px, loading, transport error, empty, fallback; no page errors",
+    "live_endpoint": "3 rows through actual local AG-UI route; mode live",
+    "captures": "docs/images/okn-*.png and okn-walkthrough.webm; genuine dated public snapshot UI"
+  }
 }

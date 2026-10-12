@@ -1,0 +1,100 @@
+{
+  "retrievedAt": "2026-10-12T15:21:55.372804+00:00",
+  "endpoint": "https://apps.okn.us/federation/sparql",
+  "graph": "https://purl.org/okn/frink/kg/ufokn",
+  "querySha256": "3b4162757876dd38c6d70c554776c1bafd43d74ebabf6c9b96b671cbd8b67d4c",
+  "result": {
+    "head": {
+      "vars": [
+        "feature",
+        "obs",
+        "time",
+        "depth",
+        "unitCode",
+        "quantityKindText"
+      ]
+    },
+    "results": {
+      "bindings": [
+        {
+          "feature": {
+            "type": "uri",
+            "value": "https://ufokn.org/id/urmi/9mvu6s0twh5x"
+          },
+          "obs": {
+            "type": "uri",
+            "value": "uri:WEN-OKN_impacts_observation_9mvu6s0twh5x_2024102908"
+          },
+          "time": {
+            "type": "literal",
+            "value": "2024-10-29T08:00:00"
+          },
+          "depth": {
+            "type": "literal",
+            "value": "0.276"
+          },
+          "unitCode": {
+            "type": "literal",
+            "value": "MTR"
+          },
+          "quantityKindText": {
+            "type": "literal",
+            "value": "http://qudt.org/vocab/quantitykind/Depth"
+          }
+        },
+        {
+          "feature": {
+            "type": "uri",
+            "value": "https://ufokn.org/id/urmi/9mvu9ztt54v1"
+          },
+          "obs": {
+            "type": "uri",
+            "value": "uri:WEN-OKN_impacts_observation_9mvu9ztt54v1_2024102908"
+          },
+          "time": {
+            "type": "literal",
+            "value": "2024-10-29T08:00:00"
+          },
+          "depth": {
+            "type": "literal",
+            "value": "0.095"
+          },
+          "unitCode": {
+            "type": "literal",
+            "value": "MTR"
+          },
+          "quantityKindText": {
+            "type": "literal",
+            "value": "http://qudt.org/vocab/quantitykind/Depth"
+          }
+        },
+        {
+          "feature": {
+            "type": "uri",
+            "value": "https://ufokn.org/id/urmi/9mvu9zwtgy1s"
+          },
+          "obs": {
+            "type": "uri",
+            "value": "uri:WEN-OKN_impacts_observation_9mvu9zwtgy1s_2024102908"
+          },
+          "time": {
+            "type": "literal",
+            "value": "2024-10-29T08:00:00"
+          },
+          "depth": {
+            "type": "literal",
+            "value": "0.095"
+          },
+          "unitCode": {
+            "type": "literal",
+            "value": "MTR"
+          },
+          "quantityKindText": {
+            "type": "literal",
+            "value": "http://qudt.org/vocab/quantitykind/Depth"
+          }
+        }
+      ]
+    }
+  }
+}

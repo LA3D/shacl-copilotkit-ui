@@ -1,0 +1,17 @@
+PREFIX schema: <https://schema.org/>
+SELECT DISTINCT ?feature ?obs ?time ?depth ?unitCode ?quantityKindText
+FROM <https://purl.org/okn/frink/kg/ufokn>
+WHERE {
+  VALUES ?feature {
+    <https://ufokn.org/id/urmi/9mvu6s0twh5x>
+    <https://ufokn.org/id/urmi/9mvu9ztt54v1>
+    <https://ufokn.org/id/urmi/9mvu9zwtgy1s>
+  }
+  ?obs schema:observationAbout ?feature ;
+       schema:observationDate ?time ; schema:variableMeasured ?quantity .
+  ?quantity schema:propertyID ?quantityKindText ;
+            schema:value ?depth ; schema:unitCode ?unitCode .
+  FILTER(?quantityKindText = "http://qudt.org/vocab/quantitykind/Depth")
+}
+ORDER BY ?feature ?time ?obs
+LIMIT 12

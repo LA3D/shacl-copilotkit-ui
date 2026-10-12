@@ -14,7 +14,7 @@ try {
       if (chunk.toString().includes('Isolated deterministic demo:')) { clearTimeout(timeout); resolve(); }
     });
   });
-  for (const script of ['test/transport-smoke.mjs', 'test/prism-transport.mjs']) {
+  for (const script of ['test/transport-smoke.mjs', 'test/prism-transport.mjs', 'test/okn-transport.mjs']) {
     const child = spawn(process.execPath, [script], { stdio: 'inherit' });
     const [code] = await once(child, 'exit');
     if (code !== 0) throw new Error(`${script} failed: ${code}`);
