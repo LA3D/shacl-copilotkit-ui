@@ -8,3 +8,5 @@ No upstream repository snapshot or dependency implementation is committed here. 
 - Hand-authored ontology-vocabulary-derived demo: existing MIT notice, copyright 2026 LA3D, preserved in `third-party/ontology-vocabulary-MIT.txt`. Referencing namespace IRIs does not bundle or activate external ontology closures.
 
 The downloader checks the exact archive hashes recorded during the original experiment. Archives, extracted trees, package caches and generated results remain ignored. No broad relicense of third-party code is intended.
+
+- The three factual prediction records in `e2e-demo/fixtures/okn/snapshot.json` come from the public UFOKN named graph served by OKN. Source endpoint, graph, retrieval time and query hash accompany the raw bindings. They are attributed public source data, not a claim to relicense the upstream dataset under this project's MIT license. SOSA/QUDT namespace references and the local mapping do not bundle the complete ontologies. See `docs/okn-example.md`.

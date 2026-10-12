@@ -33,5 +33,33 @@
     ]
   },
   "browser_verification": "Not rerun in release preparation; historical screenshots excluded",
-  "remote_ci": "See GitHub Actions for checks on the published commit; local results above are independent."
+  "remote_ci": "See GitHub Actions for checks on the published commit; local results above are independent.",
+  "okn_extension": {
+    "checked_at": "2026-10-12",
+    "backend_tests": {
+      "passed": 31,
+      "failed": 0
+    },
+    "typecheck": "passed",
+    "lint": "passed",
+    "build": "passed with existing warnings",
+    "transport": "14 existing checks plus OKN snapshot/switch/spec/repeat/origin checks passed",
+    "browser": "chart, table, inspector, repeat, 390px, loading, transport error, empty, fallback; no page errors",
+    "live_endpoint": "3 rows through actual local AG-UI route; mode live",
+    "captures": "docs/images/okn-*.png and okn-walkthrough.webm; genuine dated public snapshot UI"
+  },
+  "okn_rdf_revision": {
+    "checked_at": "2026-10-12",
+    "backend_tests": {
+      "passed": 37,
+      "failed": 0
+    },
+    "typecheck": "passed",
+    "lint": "passed",
+    "build": "passed with existing dependency warnings",
+    "transport": "14 original checks plus OKN RDF-only change, unchanged query/rows/graph/intent, tool spec, repeat and origin rejection passed",
+    "browser": "RDF profile A/B/A; equal data hash and intent, different profile hash; inspector, 390px, loading/error/empty/fallback; no page errors",
+    "standard_profile": "SHUI published 2026-05-26 hash namespace; bounded DASH viewer aliases; custom project chart/mapping vocabulary",
+    "live_endpoint": "Not re-fetched for this revision; dated public snapshot retained"
+  }
 }

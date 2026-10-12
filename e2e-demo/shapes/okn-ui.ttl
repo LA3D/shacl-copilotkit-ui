@@ -1,0 +1,30 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix shui: <http://www.w3.org/ns/shacl-ui#> .
+@prefix ui: <https://example.org/okn-ui-hints/> .
+@prefix demo: <https://example.org/okn-ui/> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+# Local presentation profile, separate from okn.ttl data constraints.
+# Only the compare viewer is supplied by the selected one-triple profile.
+ui:DatasetShape a sh:NodeShape ; sh:targetNode demo:dataset ;
+  sh:property ui:Compare, ui:Evidence .
+ui:Compare a sh:PropertyShape ; sh:path demo:prediction ; sh:node ui:Row ;
+  sh:name "Predicted flood depth" ; ui:forIntent ui:compare ;
+  ui:fallbackViewer shui:ValueTableViewer ;
+  ui:category ui:Feature ; ui:measure ui:Depth ; ui:unit ui:Unit ; ui:time ui:Time .
+ui:Evidence a sh:PropertyShape ; sh:path demo:prediction ; sh:node ui:Row ;
+  sh:name "Records behind the comparison" ; ui:forIntent ui:evidence ;
+  shui:viewer shui:ValueTableViewer ; ui:fallbackViewer shui:ValueTableViewer ;
+  ui:category ui:Feature ; ui:measure ui:Depth ; ui:unit ui:Unit ; ui:time ui:Time .
+ui:Row a sh:NodeShape ; sh:property ui:Feature, ui:Time, ui:Depth, ui:Unit, ui:Source .
+ui:Feature a sh:PropertyShape ; sh:path sosa:hasFeatureOfInterest ;
+  sh:name "Feature" ; sh:order 1 ; shui:viewer shui:IRIViewer .
+ui:Time a sh:PropertyShape ; sh:path demo:sourceTimestamp ;
+  sh:name "Source timestamp" ; sh:order 2 ; shui:viewer shui:LiteralViewer .
+ui:Depth a sh:PropertyShape ; sh:path (sosa:hasResult qudt:numericValue) ;
+  sh:name "Predicted depth (m)" ; sh:order 3 ; shui:viewer shui:LiteralViewer .
+ui:Unit a sh:PropertyShape ; sh:path (sosa:hasResult qudt:unit) ;
+  sh:name "QUDT unit" ; sh:order 4 ; shui:viewer shui:IRIViewer .
+ui:Source a sh:PropertyShape ; sh:path prov:wasDerivedFrom ;
+  sh:name "Source observation" ; sh:order 5 ; shui:viewer shui:IRIViewer .

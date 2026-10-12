@@ -11,3 +11,9 @@ Excluded: saved stores and action ledgers, original transport logs, old screensh
 Original experiments explored SHUI/DASH adapter feasibility, typed RDF state, backend candidate validation, human review and role-dependent projections. Only the implemented subset is claimed here; standards coverage, real model integration and production stakeholder authorization remain future work.
 
 Documentation framing was revised to explain the exploration of small data-carried hints, the distinct roles of semantics/validation/policy/rendering, and a conceptual time-series example. That example is new explanatory material, not recovered implementation or a new supported runtime profile.
+
+## OKN extension
+
+The new OKN route is a separately authored extension. Its three public records were fetched using the checked-in bounded query on 2026-10-12; the snapshot includes retrieval time, endpoint, named graph, query hash and raw result bindings. New screenshots and recording capture that labeled snapshot in the working UI. No earlier private-context screenshots were reused. See [OKN provenance and mapping](okn-example.md).
+
+The RDF presentation revision replaces the local JSON hints with newly authored Turtle profiles and a strict compiler. The two profiles differ by one viewer triple; screenshots/recording now demonstrate the same question/data with different RDF preferences. Published SHUI, its current editor draft and DASH definitions were checked, and their namespace/version differences and partial implementation are documented. No upstream implementation code or new dependencies were copied.
