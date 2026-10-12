@@ -1,0 +1,22 @@
+name: Prototype checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/fetch-upstream.py
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+        working-directory: e2e-demo
+      - run: npm run typecheck && npm run lint && npm test && npm run build
+        working-directory: e2e-demo
+      - run: node test/run-transport.mjs
+        working-directory: e2e-demo

@@ -1,0 +1,25 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix p: <https://w3id.org/la3d/prism-validation/> .
+@prefix emfo: <https://github.com/CC-RMD-EpiBio/EcologicalMentalFunctioningOntology/EMFO#> .
+@prefix d: <https://example.org/prism-view/> .
+
+# Hand-authored, bounded extraction from PRISM's LinkML model, not a generated full profile.
+# min/max counts, single-line and length restrictions are additional demo requirements.
+d:CharacterizationShape a sh:NodeShape ; sh:targetNode d:characterization-001 ;
+  sh:property d:FunctionField, d:SubjectLink, d:ContextLink, d:EvidenceLink .
+d:FunctionField sh:path p:functional_state ; sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ; sh:minLength 1 .
+d:SubjectLink sh:path p:subject_sailor ; sh:nodeKind sh:IRI ; sh:minCount 1 ; sh:maxCount 1 .
+d:ContextLink sh:path emfo:has_contextualization ; sh:nodeKind sh:IRI ; sh:minCount 1 ; sh:maxCount 1 .
+d:EvidenceLink sh:path p:key_observations ; sh:nodeKind sh:IRI ; sh:minCount 1 .
+d:ContextualizationShape a sh:NodeShape ; sh:targetNode d:contextualization-001 ; sh:property d:ContextFactorLink .
+d:ContextFactorLink sh:path emfo:has_context ; sh:nodeKind sh:IRI ; sh:minCount 1 ; sh:maxCount 1 .
+d:ContextShape a sh:NodeShape ; sh:targetNode d:context-001 ; sh:property d:ContextField, d:PhaseField .
+d:ContextField sh:path p:context_description ; sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ; sh:minLength 1 ; sh:maxLength 180 ; sh:singleLine true .
+d:PhaseField sh:path p:operational_phase ; sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 .
+d:OperationalObservationShape a sh:NodeShape ; sh:targetNode d:key-operational ; sh:property d:OperationalTextField, d:OperationalSourceLink .
+d:OperationalTextField sh:path p:observation_text ; sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 .
+d:OperationalSourceLink sh:path p:references_observation ; sh:nodeKind sh:IRI ; sh:minCount 1 ; sh:maxCount 1 .
+d:MedicalObservationShape a sh:NodeShape ; sh:targetNode d:key-medical ; sh:property d:MedicalTextField, d:MedicalSourceLink .
+d:MedicalTextField sh:path p:observation_text ; sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ; sh:minLength 1 ; sh:maxLength 180 ; sh:singleLine true .
+d:MedicalSourceLink sh:path p:references_observation ; sh:nodeKind sh:IRI ; sh:minCount 1 ; sh:maxCount 1 .

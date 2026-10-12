@@ -1,0 +1,18 @@
+{
+  "name": "shacl-ui-node-comparison",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "shacl-engine": "file:./sources/shacl-engine.tar.gz",
+    "@rdfjs/data-model": "^2.1.1",
+    "@rdfjs/dataset": "^2.0.2",
+    "@rdfjs/environment": "^1.0.0",
+    "@rdfjs/normalize": "^2.0.4",
+    "@rdfjs/parser-n3": "^2.2.0",
+    "@rdfjs/traverser": "^0.1.4",
+    "rdf-test": "^0.1.1",
+    "rdf-utils-fs": "^3.0.1",
+    "stream-chunks": "^1.0.0"
+  }
+}

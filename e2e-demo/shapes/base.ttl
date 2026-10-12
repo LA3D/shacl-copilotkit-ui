@@ -1,0 +1,6 @@
+@prefix ex: <https://example.org/shui-demo/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+ex:record-001 ex:title "Plan a field visit" ; ex:status ex:planned ; ex:channel ex:phone ;
+    ex:referenceNumber "007"^^xsd:integer ;
+    ex:source ex:source-A, ex:source-B ;
+    ex:note "Synthetic record"@en, "Dossier fictif"@fr .

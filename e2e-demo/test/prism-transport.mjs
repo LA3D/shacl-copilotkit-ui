@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import { EventSchemas } from '@ag-ui/core/schemas';
+const base='http://127.0.0.1:4173',D='https://example.org/prism-view/';
+const checks=[];
+async function bootstrap(role){const r=await fetch(`${base}/api/prism/${role}/bootstrap`);assert.equal(r.status,200);return r.json();}
+async function run(role,command,state,extra={}){const r=await fetch(`${base}/api/prism/${role}/agent`,{method:'POST',headers:{'content-type':'application/json',origin:base},body:JSON.stringify({threadId:'transport-prism',runId:crypto.randomUUID(),state,messages:[],tools:[],context:[],forwardedProps:{command,...extra}})});assert.equal(r.status,200);const events=(await r.text()).split('\n\n').filter(Boolean).map(line=>JSON.parse(line.replace(/^data: /,'')));events.forEach(e=>EventSchemas.parse(e));return events;}
+const c=await bootstrap('command'),m=await bootstrap('medical');assert.equal(c.descriptor.focus,m.descriptor.focus);assert.equal(c.recordRevision,m.recordRevision);checks.push('Same stable record and revision in both bootstrap projections');
+const events=await run('command','open',c);assert.ok(events.some(e=>e.type==='TOOL_CALL_START'&&e.toolCallName==='show_prism'));assert.ok(events.some(e=>e.type==='STATE_SNAPSHOT'));checks.push('Registered show_prism tool and schema-valid AG-UI snapshot');
+const proposal=await run('command','propose',c);assert.ok(proposal.some(e=>e.type==='STATE_DELTA'));const commandPayload=JSON.stringify([c,events,proposal]);for(const word of ['source-medical','key-medical','MedicalTextField','Synthetic private encounter','PRIVATE_FIXTURE_42','UNTRUSTED_ANNOTATION_SENTINEL'])assert.equal(commandPayload.includes(word),false);checks.push('Command bootstrap, snapshots, tool arguments, and deltas exclude medical fixture identifiers/values');
+const invalid=structuredClone(c);invalid.draft[D+'ContextField']=[];const rejected=await run('command','review',invalid);const validation=rejected.find(e=>e.type==='STATE_SNAPSHOT').snapshot.validation;assert.equal(validation.conforms,false);assert.equal(validation.errors[0].field,D+'ContextField');checks.push('Invalid candidate reports the correct field over SSE');
+const forged=structuredClone(c);forged.persona='medical';forged.draft[D+'MedicalTextField']=m.draft[D+'MedicalTextField'];assert.ok((await run('command','review',forged)).some(e=>e.type==='RUN_ERROR'&&e.message.startsWith('Denied')));checks.push('Forged persona and hidden-field edit rejected by server');
+assert.ok((await run('medical','prescribe',m)).some(e=>e.type==='RUN_ERROR'));checks.push('Denied clinical action returns RUN_ERROR');
+const badOrigin=await fetch(`${base}/api/prism/command/agent`,{method:'POST',headers:{origin:'https://example.invalid','content-type':'application/json'},body:'{}'});assert.equal(badOrigin.status,403);checks.push('Cross-origin POST blocked');
+const old=await fetch(base+'/api/bootstrap');assert.equal(old.status,200);assert.equal((await old.json()).descriptor.fields.length,3);checks.push('Original three-field demo endpoint preserved');
+const out={date:new Date().toISOString(),passed:checks.length,checks};await fs.writeFile('evidence/prism/transport-checks.json',JSON.stringify(out,null,2));console.log(JSON.stringify(out,null,2));

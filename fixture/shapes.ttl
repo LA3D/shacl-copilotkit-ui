@@ -1,0 +1,34 @@
+@prefix ex: <https://example.org/shui-demo/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix shui: <http://www.w3.org/ns/shacl-ui#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# UI profile: published 2026-05-26; intentionally not the editor's slash namespace.
+# Synthetic generic metadata, not an MSO/PRISM production schema.
+ex:RecordShape a sh:NodeShape ; sh:targetClass ex:EvidenceRecord ;
+  sh:property ex:TitleShape, ex:CountShape, ex:DateShape, ex:SourceShape, ex:ReviewedShape .
+ex:Identity a sh:PropertyGroup ; rdfs:label "Identity and provenance" ; sh:order 0 .
+ex:Details a sh:PropertyGroup ; rdfs:label "Review details" ; sh:order 1 .
+ex:TitleShape a sh:PropertyShape ; sh:path ex:title ; sh:name "Title" ;
+  sh:datatype rdf:langString ; sh:minCount 1 ; sh:uniqueLang true ;
+  sh:group ex:Identity ; sh:order 0 ; shui:propertyRole shui:LabelRole ;
+  shui:editor shui:TextFieldEditor ; shui:viewer shui:LiteralViewer .
+ex:SourceShape a sh:PropertyShape ; sh:path ex:source ; sh:name "Sources" ;
+  sh:nodeKind sh:IRI ; sh:minCount 1 ; sh:group ex:Identity ; sh:order 1 ;
+  shui:editor shui:IRIEditor ; shui:viewer shui:IRIViewer .
+ex:CountShape a sh:PropertyShape ; sh:path ex:count ; sh:name "Count" ;
+  sh:datatype xsd:integer ; sh:minCount 1 ; sh:maxCount 1 ;
+  sh:minInclusive 0 ; sh:maxInclusive 10 ; sh:group ex:Details ; sh:order 0 ;
+  shui:editor shui:TextFieldEditor .
+ex:DateShape a sh:PropertyShape ; sh:path ex:date ; sh:name "Date" ;
+  sh:datatype xsd:date ; sh:maxCount 1 ; sh:group ex:Details ; sh:order 1 ;
+  shui:editor shui:DatePickerEditor .
+ex:ReviewedShape a sh:PropertyShape ; sh:path ex:reviewed ; sh:name "Reviewed" ;
+  sh:datatype xsd:boolean ; sh:maxCount 1 ; sh:group ex:Details ; sh:order 2 ;
+  shui:editor shui:BooleanEditor .
+
+# A second target demonstrates why validating only the visible form is insufficient.
+ex:NoteShape a sh:NodeShape ; sh:targetClass ex:ReviewNote ; sh:property ex:NoteTitleShape .
+ex:NoteTitleShape a sh:PropertyShape ; sh:path ex:title ; sh:minCount 1 .

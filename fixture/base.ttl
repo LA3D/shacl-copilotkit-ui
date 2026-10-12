@@ -1,0 +1,9 @@
+@prefix ex: <https://example.org/shui-demo/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+ex:record-001 a ex:EvidenceRecord ;
+  ex:title "Synthetic evidence record"@en, "Fiche synthétique"@fr ;
+  ex:source <https://example.org/source/a>, <https://example.org/source/b> ;
+  ex:count "007"^^xsd:integer ;
+  ex:date "2026-10-09"^^xsd:date ;
+  ex:reviewed "false"^^xsd:boolean .
+ex:note-001 a ex:ReviewNote ; ex:title "Preserve this contextual record" .

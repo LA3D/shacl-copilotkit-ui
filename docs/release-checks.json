@@ -1,0 +1,37 @@
+{
+  "checked_at": "2026-10-12",
+  "environment": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "26.8.2",
+    "npm": "11.19.1"
+  },
+  "locked_installs": {
+    "e2e-demo": "passed",
+    "node-experiment": "passed",
+    "lifecycle_scripts": "disabled"
+  },
+  "demo": {
+    "typecheck": "passed",
+    "lint": "passed",
+    "backend_tests": {
+      "passed": 21,
+      "failed": 0
+    },
+    "build": "passed with dependency directive and chunk-size warnings",
+    "original_transport_checks": 6,
+    "role_transport_checks": 8
+  },
+  "comparison": {
+    "passed": 48,
+    "failed": 2,
+    "unsupported": 2,
+    "exit_code": 1,
+    "failing_cases": [
+      "rootClass-transitive",
+      "rootClass-hierarchy-shapes-only"
+    ]
+  },
+  "browser_verification": "Not rerun in release preparation; historical screenshots excluded",
+  "remote_ci": "See GitHub Actions for checks on the published commit; local results above are independent."
+}

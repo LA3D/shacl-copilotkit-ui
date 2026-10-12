@@ -1,0 +1,20 @@
+@prefix d: <https://example.org/prism-view/> .
+@prefix p: <https://w3id.org/la3d/prism-validation/> .
+@prefix emfo: <https://github.com/CC-RMD-EpiBio/EcologicalMentalFunctioningOntology/EMFO#> .
+@prefix mh: <https://w3id.org/la3d/mental-state-ontology/core/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+# Entirely invented; no real person, case, clinical text, prediction, or risk band.
+d:characterization-001 a p:Characterization ; p:subject_sailor d:person-001 ;
+  p:functional_state "Participating in scheduled team activities" ;
+  emfo:has_contextualization d:contextualization-001 ;
+  p:key_observations d:key-operational, d:key-medical ;
+  prov:wasDerivedFrom d:source-operational, d:source-medical .
+d:person-001 a mh:Person .
+d:contextualization-001 a emfo:ProcessContextualization ; emfo:has_context d:context-001 .
+d:context-001 a emfo:Contextual_Factors ; p:operational_phase "training" ;
+  p:context_description "Synthetic training period; watch schedule changed this week." .
+d:key-operational a p:KeyObservation ; p:observation_text "Team attendance recorded for the scheduled exercise." ; p:references_observation d:source-operational .
+d:key-medical a p:KeyObservation ; p:observation_text "Synthetic private encounter: participant requested a follow-up conversation." ; p:references_observation d:source-medical .
+d:source-operational a mh:Observation ; d:fixtureCode "007"^^xsd:integer ; d:note "Synthetic only"@en, "Fictif uniquement"@fr .
+d:source-medical a mh:Observation ; d:privateMarker "PRIVATE_FIXTURE_42" .

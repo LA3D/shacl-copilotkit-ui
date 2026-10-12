@@ -1,0 +1,117 @@
+{
+  "source": "Local Shape Studio experiment, 2026-10-09; role-view extension 2026-10-10",
+  "files": [
+    {
+      "path": "e2e-demo/src/main.tsx",
+      "original_sha256": "a4dd62c93cd80a1754cf71badff905087d73d25c258e21f85ee44ceadffdced9"
+    },
+    {
+      "path": "e2e-demo/src/prism.css",
+      "original_sha256": "94ca694fd5e2b21cf863e8f691e0b450f6fd7f8bfb543b0bcef250c6ac5fa2bb"
+    },
+    {
+      "path": "e2e-demo/src/prism.tsx",
+      "original_sha256": "10a3a496de65f9949f1d38f400c20fa6b9933328095e40b4da92e1dabfeac9f6"
+    },
+    {
+      "path": "e2e-demo/src/style.css",
+      "original_sha256": "736a13e91c935a9526465cf00ed6603b0a8377ec4b7113926664888cd5925fb6"
+    },
+    {
+      "path": "e2e-demo/src/types.ts",
+      "original_sha256": "2c9cf0a690047256e050716b8696ed0837df434f240fddfaa1d94b6f90a39c39"
+    },
+    {
+      "path": "e2e-demo/server/http.mjs",
+      "original_sha256": "6bbc50c2e1f1625606ecc15f43a63db647a602314cd61fcc00666401c5ddfbc1"
+    },
+    {
+      "path": "e2e-demo/server/prism.mjs",
+      "original_sha256": "96dee955db0377095f8b7e62a4dd7d63348f786067c3a580af5acbd63827d9da"
+    },
+    {
+      "path": "e2e-demo/server/rdf.mjs",
+      "original_sha256": "637792b256ff68ede1ff29902ea7a7f17fe5acd9fdef7a960ebabce546d478e0"
+    },
+    {
+      "path": "e2e-demo/server/service.mjs",
+      "original_sha256": "1cd8acccdf72efcbbbcfe6f05805f7a347334bf9ebb977ab92fc17708587f94a"
+    },
+    {
+      "path": "e2e-demo/shapes/base.ttl",
+      "original_sha256": "2aa25e75fb1f7e3ad00bb3db9657e4c2efcb4af38002f2ca503160ea13f15ba7"
+    },
+    {
+      "path": "e2e-demo/shapes/prism/domain.ttl",
+      "original_sha256": "8d3d53d8eeb12a947d1bd9df999a6d95de6939597636f90b017ded2e763a7e04"
+    },
+    {
+      "path": "e2e-demo/shapes/prism/record.ttl",
+      "original_sha256": "c1e65ca41e3c1239dcc83b36a33914019bde0ade1dd1433996bc55dafd2ca6a5"
+    },
+    {
+      "path": "e2e-demo/shapes/prism/ui.ttl",
+      "original_sha256": "d009e5e40ac40cab452f9d46f2cb2cd12fcc7cfc0af74d918a5cc7bb315a21d7"
+    },
+    {
+      "path": "e2e-demo/shapes/record.ttl",
+      "original_sha256": "70c9ece49048ab994f54c7407efcd08e04fc4691f23d2d9a28f6c13b05310f3c"
+    },
+    {
+      "path": "e2e-demo/test/prism-transport.mjs",
+      "original_sha256": "4f0ad9475348c0693797e8273e81910dd795365736c1af5787cc2eae6445bcf5"
+    },
+    {
+      "path": "e2e-demo/test/prism.test.mjs",
+      "original_sha256": "cc14bb498c5ba5d5593356f8f32f90a7beac43c9e162f2b33534e208568561be"
+    },
+    {
+      "path": "e2e-demo/test/service.test.mjs",
+      "original_sha256": "8a854e00a63e718af9967735d4698c0f5c6e8a0a801f77fb5c8698250c3aeeaa"
+    },
+    {
+      "path": "e2e-demo/test/transport-smoke.mjs",
+      "original_sha256": "030f94c17b8b6d7c1b62ba3de9a9a2cd0ca62035325c594c8760418d61269783"
+    },
+    {
+      "path": "e2e-demo/package.json",
+      "original_sha256": "4ee03563b437bfc1bb478a47b30480b23ad74ea50a35ab231ab63d1921e5162e"
+    },
+    {
+      "path": "e2e-demo/package-lock.json",
+      "original_sha256": "53ed81a5a80810ca4cdb59f795283f158b4f3296fefbacdc62b74519f96f4665"
+    },
+    {
+      "path": "e2e-demo/tsconfig.json",
+      "original_sha256": "5a91afde07c8100181daaa4f4e4efa40dfe2f3d1da34ef5946885d9b2ef913de"
+    },
+    {
+      "path": "e2e-demo/eslint.config.mjs",
+      "original_sha256": "9731e5163466ed70ff4cac1ca7b18920d24ef0a8c83855cf42877350246feb1d"
+    },
+    {
+      "path": "e2e-demo/index.html",
+      "original_sha256": "512b243128b7f456c4cfe90f567911b4f49fbcfeb3b7981441d7c962b95ae90d"
+    },
+    {
+      "path": "node-experiment/run-comparison.mjs",
+      "original_sha256": "4213cf19e4410533273681daf436c2276336928e7074c98d865667690d865eec"
+    },
+    {
+      "path": "node-experiment/package.json",
+      "original_sha256": "9aab730c7af3b6072346ab038a9a21e616baf34785c11b59772989be17130682"
+    },
+    {
+      "path": "node-experiment/package-lock.json",
+      "original_sha256": "34ece1f3440642ac4537fdd4825b4150ed58dd48cc4d793a55fb7718ca7ab69c"
+    },
+    {
+      "path": "fixture/base.ttl",
+      "original_sha256": "1ed3280c0f941413c121075164981efa757421a927f1588edb9d91c552413297"
+    },
+    {
+      "path": "fixture/shapes.ttl",
+      "original_sha256": "e1b0726420c99acd740eca9afeaf25844eb86cb2e92f4b4b2765b2de0eea41e5"
+    }
+  ]
+}

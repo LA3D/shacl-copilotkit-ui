@@ -1,0 +1,34 @@
+@prefix ex: <https://example.org/shui-demo/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix shui: <http://www.w3.org/ns/shacl-ui#> .
+@prefix shnex: <http://www.w3.org/ns/shacl-node-expr#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# Trusted demo profile: published SHUI FPWD hash namespace, with a separately
+# pinned experimental node-expression constraint. No arbitrary widget loading.
+ex:RecordShape a sh:NodeShape ; sh:targetNode ex:record-001 ;
+    sh:property ex:TitleShape, ex:StatusShape, ex:ChannelShape .
+ex:Details a sh:PropertyGroup ; rdfs:label "Record details" ; sh:order 1 .
+ex:TitleShape a sh:PropertyShape ; sh:path ex:title ; sh:name "Title" ;
+    sh:description "Give this record a short, single-line title." ;
+    sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ;
+    sh:minLength 1 ; sh:maxLength 120 ; sh:singleLine true ;
+    sh:group ex:Details ; sh:order 1 ;
+    shui:editor shui:TextFieldEditor ; shui:propertyRole shui:LabelRole .
+ex:StatusShape a sh:PropertyShape ; sh:path ex:status ; sh:name "Status" ;
+    sh:description "Status determines the available contact methods." ;
+    sh:nodeKind sh:IRI ; sh:minCount 1 ; sh:maxCount 1 ;
+    sh:in (ex:planned ex:active) ; sh:group ex:Details ; sh:order 2 ;
+    shui:editor shui:EnumSelectEditor .
+ex:ChannelShape a sh:PropertyShape ; sh:path ex:channel ; sh:name "Contact method" ;
+    sh:description "Available methods are read from the current server catalog." ;
+    sh:nodeKind sh:IRI ; sh:minCount 1 ; sh:maxCount 1 ;
+    sh:in [ shnex:pathValues ex:allowed ; shnex:focusNode [ shnex:pathValues ex:status ] ] ;
+    sh:group ex:Details ; sh:order 3 ; shui:editor shui:EnumSelectEditor .
+ex:planned rdfs:label "Planned" .
+ex:active rdfs:label "Active" .
+ex:phone rdfs:label "Phone" .
+ex:visit rdfs:label "In person" .
+ex:video rdfs:label "Video call" .
+ex:message rdfs:label "Secure message" .
