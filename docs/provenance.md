@@ -15,3 +15,5 @@ Documentation framing was revised to explain the exploration of small data-carri
 ## OKN extension
 
 The new OKN route is a separately authored extension. Its three public records were fetched using the checked-in bounded query on 2026-10-12; the snapshot includes retrieval time, endpoint, named graph, query hash and raw result bindings. New screenshots and recording capture that labeled snapshot in the working UI. No earlier private-context screenshots were reused. See [OKN provenance and mapping](okn-example.md).
+
+The RDF presentation revision replaces the local JSON hints with newly authored Turtle profiles and a strict compiler. The two profiles differ by one viewer triple; screenshots/recording now demonstrate the same question/data with different RDF preferences. Published SHUI, its current editor draft and DASH definitions were checked, and their namespace/version differences and partial implementation are documented. No upstream implementation code or new dependencies were copied.

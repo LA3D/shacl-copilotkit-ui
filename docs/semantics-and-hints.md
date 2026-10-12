@@ -2,7 +2,7 @@
 
 The question behind this small experiment is: can an agent use meaning and a few interface hints carried with data to build a useful interaction through an existing UI toolkit? An agent is capable of choosing a presentation. Hints can spare it repeated guesswork about what a field represents or which interaction is usually useful, without attempting to specify every screen or conversation.
 
-The present code tests a narrow part of that idea: scripted proposals, explicit form editor annotations, registered React components and a validated edit round trip. The [working OKN extension](okn-example.md) adds a bounded public query and a scripted comparison-chart/table choice from presentation hints and result checks. It does not test a live agent's ability to choose a layout, infer user intent or select a chart. Those are exploratory directions, not shipped features.
+The present code tests a narrow part of that idea: scripted proposals, explicit form editor annotations, registered React components and a validated edit round trip. The [working OKN extension](okn-example.md) adds a bounded public query and an RDF-compiled comparison-chart/table choice with scripted intent and explicit result checks. It does not test a live agent's ability to choose a layout, infer user intent or select a chart. Those are exploratory directions, not shipped features.
 
 ## Six distinct roles
 

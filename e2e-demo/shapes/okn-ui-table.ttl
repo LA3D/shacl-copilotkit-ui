@@ -1,0 +1,3 @@
+@prefix shui: <http://www.w3.org/ns/shacl-ui#> .
+@prefix ui: <https://example.org/okn-ui-hints/> .
+ui:Compare shui:viewer shui:ValueTableViewer .

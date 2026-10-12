@@ -3,6 +3,8 @@ import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import { Engine } from 'shacl-engine';
 import { factory, named, parse, serialize, XSD } from './rdf.mjs';
+import { PRESENTATIONS, present } from './okn-presentation.mjs';
+export { ViewSchema } from './okn-presentation.mjs';
 
 export const ENDPOINT = 'https://apps.okn.us/federation/sparql';
 export const GRAPH = 'https://purl.org/okn/frink/kg/ufokn';
@@ -13,13 +15,7 @@ export const QUESTIONS = {
   compare: 'Compare predicted flood depth for these three features.',
   evidence: 'Show the supporting records and units.'
 };
-export const HINTS = z.object({ namespace: z.literal('https://example.org/okn-ui-hints/'), preferredView: z.literal('comparison'),
-  categoryField: z.literal('feature'), quantityField: z.literal('depth'), unit: z.literal('http://qudt.org/vocab/unit/M'),
-  evidenceView: z.literal('table'), note: z.string().max(200) }).strict().parse(JSON.parse(await fs.readFile(new URL('../fixtures/okn/hints.json', import.meta.url), 'utf8')));
-export const ViewSchema = z.object({ kind: z.enum(['comparison', 'table']), question: z.enum(['compare', 'evidence']),
-  categoryField: z.literal('feature'), valueField: z.literal('depth'), unit: z.literal('http://qudt.org/vocab/unit/M'),
-  datasetId: z.string().regex(/^[a-f0-9]{64}$/) }).strict();
-const RequestSchema = z.object({ question: z.enum(['compare', 'evidence']), source: z.enum(['live', 'snapshot']) }).strict();
+const RequestSchema = z.object({ question: z.enum(['compare', 'evidence']), source: z.enum(['live', 'snapshot']), profile: z.enum(['chart','table']).default('chart') }).strict();
 const Binding = z.object({ type: z.enum(['uri', 'literal', 'typed-literal']), value: z.string().max(500), datatype: z.string().optional() }).strict();
 const ResultSchema = z.object({ head: z.object({ vars: z.array(z.string()) }), results: z.object({ bindings: z.array(z.object({
   feature: Binding, obs: Binding, time: Binding, depth: Binding, unitCode: Binding, quantityKindText: Binding
@@ -44,25 +40,17 @@ export function normalize(result) {
     if (b.unitCode.value !== 'MTR' || b.quantityKindText.value !== DEPTH) throw new Error('Unsupported unit or quantity kind');
     return { feature: b.feature.value, label: b.feature.value.split('/').at(-1), observation: b.obs.value,
       sourceTime: b.time.value, sourceDepth: b.depth.value, depth: Number(b.depth.value), unitCode: b.unitCode.value,
-      unit: HINTS.unit, quantityKind: DEPTH, raw: b };
+      unit: 'http://qudt.org/vocab/unit/M', quantityKind: DEPTH, raw: b };
   });
   // Collapse only identical projected bindings. Preserve differing values/times as evidence rows.
   return [...new Map(rows.map(row => [JSON.stringify(row.raw), row])).values()].sort((a, b) => a.feature.localeCompare(b.feature) || a.sourceTime.localeCompare(b.sourceTime) || a.observation.localeCompare(b.observation));
 }
-export function chooseView(rows, question, datasetId) {
-  const comparable = rows.length > 0 && new Set(rows.map(r => r.feature)).size === rows.length && new Set(rows.map(r => r.sourceTime)).size === 1;
-  const kind = question === 'compare' && comparable ? HINTS.preferredView : HINTS.evidenceView;
-  const reason = !rows.length ? 'No matching results: show an empty evidence table.' : question === 'evidence'
-    ? 'The question asks for sources and units: select the evidence table.' : comparable
-      ? 'One shared source timestamp, one value per feature, compatible units: select a comparison chart, not a time series.'
-      : 'The result is not one value per feature at a shared time: preserve the evidence in a table; do not aggregate implicitly.';
-  return { view: ViewSchema.parse({ kind, question, categoryField: HINTS.categoryField, valueField: HINTS.quantityField, unit: HINTS.unit, datasetId }), reason };
-}
-export async function derive(rows) {
+export async function derive(rows, asDataset = false) {
   const graph = factory.dataset();
   const add = (s, p, o) => graph.add(factory.quad(named(s), named(p), o));
   rows.forEach((row, index) => {
     const id = DEMO + 'prediction-' + index, quantity = id + '/quantity';
+    add(DEMO + 'dataset', DEMO + 'prediction', named(id));
     add(id, TYPE, named(DEMO + 'DerivedPredictionView')); add(id, TYPE, named(SOSA + 'Observation'));
     add(id, SOSA + 'hasFeatureOfInterest', named(row.feature));
     add(id, SOSA + 'observedProperty', named(DEMO + 'predictedFloodDepth'));
@@ -75,7 +63,7 @@ export async function derive(rows) {
   });
   const report = await engine.validate({ dataset: graph });
   if (!report.conforms) throw new Error('Derived graph failed the local SHACL profile');
-  return serialize(graph);
+  return asDataset ? graph : serialize(graph);
 }
 export async function fetchResult(fetchImpl = fetch) {
   const url = new URL(ENDPOINT); url.searchParams.set('query', QUERY);
@@ -93,7 +81,7 @@ export async function fetchResult(fetchImpl = fetch) {
   } finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
   return JSON.parse(Buffer.concat(chunks).toString('utf8'));
 }
-export function createOknService({ fetchImpl = fetch, now = () => Date.now(), snapshot = SNAPSHOT } = {}) {
+export function createOknService({ fetchImpl = fetch, now = () => Date.now(), snapshot = SNAPSHOT, presentations = PRESENTATIONS } = {}) {
   let cached, pending;
   async function live() {
     if (cached && now() - cached.at < 60_000) return cached.value;
@@ -118,11 +106,13 @@ export function createOknService({ fetchImpl = fetch, now = () => Date.now(), sn
         ? { result: snapshot.result, source: { mode: 'snapshot', retrievedAt: snapshot.retrievedAt, problem: null } } : await live();
       const rows = normalize(data.result);
       const datasetId = createHash('sha256').update(JSON.stringify(rows)).digest('hex');
-      const { view, reason } = chooseView(rows, request.question, datasetId);
+      const graph = await derive(rows, true);
+      const profile = presentations[request.profile];
+      const { view, reason, records } = present(graph, profile, request.question, datasetId);
       return { rows, view, reason, questionText: QUESTIONS[request.question], query: QUERY, queryHash: QUERY_HASH,
-        hints: HINTS, endpoint: ENDPOINT, graph: GRAPH, source: data.source,
-        derivedGraph: await derive(rows), validation: 'Local SHACL profile passed; structural checks only.',
-        notice: 'Scripted view selection · prediction data · read-only · no live model' };
+        records, profile: request.profile, hints: profile.turtle, endpoint: ENDPOINT, graph: GRAPH, source: data.source,
+        derivedGraph: serialize(graph), validation: 'Local SHACL profile passed; structural checks only.',
+        notice: 'Deterministic intent · RDF viewer selection · prediction data · read-only · no live model' };
     }
   };
 }

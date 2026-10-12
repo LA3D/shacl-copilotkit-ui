@@ -2,7 +2,7 @@
 
 This is a **very simple exploratory prototype of dynamically agent-driven user interfaces**: represent small interface hints in data, then connect that data to a UI toolkit through CopilotKit and AG-UI. An agent can make presentation decisions; hints give it useful context, reduce ambiguity and help similar situations receive consistent treatment. The aim is not to prescribe every interaction or encode a uniquely correct interface.
 
-**Current implementation:** two synthetic form examples plus a small public OKN query example. Two preset questions select a comparison chart or evidence table through a deterministic driver and registered React components. There is no live model deciding layouts or generating SPARQL. This is an exploration, not a framework or production system; no model credentials are needed.
+**Current implementation:** two synthetic form examples plus a small public OKN query example. Preset questions select an intent; local RDF presentation profiles select a registered chart or table and supply field mappings. Switching one RDF viewer triple changes the view while the query, data and question stay fixed. There is no live model deciding layouts or generating SPARQL. This is an exploration, not a framework or production system; no model credentials are needed.
 
 ## Why semantics and small hints help
 
@@ -12,17 +12,17 @@ In the working example, `sh:path ex:title` identifies the field, `sh:minCount 1`
 
 For dynamic visualization, a time field, numeric measure and unit could suggest a time-series view. A small hint could reinforce that choice while leaving an agent free to choose points, lines, groups or a table after checking the actual data and task. Irregular sampling, missing values, aggregation and incompatible units can change that decision. **That time-series example remains conceptual. The working OKN example below compares three predictions at one source timestamp; it does not invent a time series.** See [semantics, hints and dynamic visualization](docs/semantics-and-hints.md) for synthetic examples and links to the actual code.
 
-## Working OKN example: change the question, change the view
+## Working OKN example: change one RDF hint, change the view
 
 Run the demo and open `http://127.0.0.1:4173/?view=okn`. The initial view uses a **dated public snapshot**, labeled in the UI. Select **Query OKN endpoint** to execute the fixed, bounded read-only SPARQL query from the local server. An endpoint failure displays an explicit dated fallback; empty live results stay empty.
 
-**“Compare predicted flood depth” → comparison chart.** Source data, semantic mapping and small presentation hints support a scripted view choice. Three features at one source time call for a comparison, not a temporal line.
+**Profile A → comparison chart.** Keep “Compare predicted flood depth” selected. The RDF profile requests the custom `ui:ComparisonViewer`; explicit unit, value and common-timestamp checks must pass.
 
 ![Working OKN comparison view using a labeled public snapshot](docs/images/okn-comparison.png)
 
-**“Show supporting records & units” → evidence table.** The same records retain their identities and values while the representation changes. This is real UI behavior, not a mockup or autonomous model demonstration.
+**Profile B → value table, with the same question and data.** Change the RDF presentation profile selector. The only RDF difference is `ui:Compare shui:viewer shui:ValueTableViewer` instead of `ui:ComparisonViewer`. Both captures show the same data hash and `compare` intent, with different RDF hashes. No renderer code is regenerated. Table columns come from `sh:node`, `sh:property`, `sh:path`, `sh:name` and `sh:order`.
 
-![Working evidence table after changing the preset question](docs/images/okn-evidence.png)
+![Working evidence table after changing only the RDF profile](docs/images/okn-evidence.png)
 
 [Watch the 10-second genuine UI recording](docs/images/okn-walkthrough.webm) · [Inspect the mechanism screenshot](docs/images/okn-mechanism.png) · [Query, mapping, tests and limits](docs/okn-example.md)
 
@@ -45,7 +45,7 @@ npm start
 
 Open exactly `http://127.0.0.1:4173`. The server restricts Host/Origin and binds to loopback. Stop it with Ctrl-C. No hosted service is supplied.
 
-- `/?view=okn`: public SPARQL result → derived SOSA/QUDT graph → scripted comparison/table selection.
+- `/?view=okn`: public SPARQL result → derived SOSA/QUDT graph → compiled RDF viewer preference → registered comparison/table.
 - `/`: propose a synthetic record edit, invalidate a required title or catalog-dependent option, correct it, review the exact change and confirm a local save.
 - `/?view=prism&persona=command`: compare Unit command and Embedded medical presentations of the same invented graph. Each simulated role has its own read/write projection.
 
@@ -64,9 +64,9 @@ The runner starts and stops its own server. Existing service tests use temporary
 
 | Implemented in this repository | Design only / excluded |
 | --- | --- |
-| One fixed public UFOKN query, dated fallback, derived SOSA/QUDT graph, safe comparison/table specs | Arbitrary queries, live model selection, time-series rendering or chart editing |
+| One fixed public UFOKN query, dated fallback, derived SOSA/QUDT graph, RDF-driven comparison/table descriptors and bounded SHUI/DASH viewer aliases | Arbitrary queries, live model selection, time-series rendering or chart editing |
 | Stable shape IDs, direct predicate paths, grouped/ordered fields, explicit SHUI editor annotations | General SHUI conformance, scoring-based editor discovery, arbitrary shapes |
-| CopilotKit registered tool rendering, AG-UI SSE snapshots and RFC 6902 state deltas | Live LLM, production CopilotKit runtime integration, DASH/A2UI renderer |
+| CopilotKit registered tool rendering, AG-UI SSE snapshots and RFC 6902 state deltas | Live LLM, production CopilotKit runtime integration, full DASH/A2UI renderer |
 | RDF term preservation, candidate-graph validation, field-routed errors | Full SHACL 1.2 coverage, Rules execution, general node expressions |
 | Server catalog-dependent choices using nested simple `pathValues` expressions | Sequence-path expression support; engine fails to compile the tested sequence form |
 | Exact-candidate review, revision checks, atomic local save, bounded persisted idempotency ledger | Distributed transactions, production authentication or authorization |
@@ -88,6 +88,18 @@ Human edits are local until sent on an AG-UI request. The server assembles a can
 - `fixture/`: synthetic RDF preservation and candidate-graph examples.
 - `docs/`: support limits, source provenance and reproducibility notes.
 
+### RDF presentation example
+
+The common local [`okn-ui.ttl`](e2e-demo/shapes/okn-ui.ttl) defines the collection and columns. Profile A adds:
+
+```turtle
+@prefix shui: <http://www.w3.org/ns/shacl-ui#> .
+@prefix ui: <https://example.org/okn-ui-hints/> .
+ui:Compare shui:viewer ui:ComparisonViewer .
+```
+
+Profile B replaces only the object with `shui:ValueTableViewer`. The `ui:` chart, intent, mapping and fallback terms are **project-owned**, not SHACL or DASH standards. RDF paths are evaluated against the derived graph; validated descriptors cross AG-UI to a fixed component registry. Zod/compiler checks protect the presentation contract; SHACL validates the separate data graph. See [supported terms and proof](docs/okn-example.md#rdf-hints-selection-and-rendering).
+
 ## SHACL draft support
 
 This is a pinned experiment against the SHUI first public working draft of 2026-05-26 and SHACL Core working draft of 2026-10-08, not a standards-conformant SHACL 1.2 product. The UI uses the published hash namespace `http://www.w3.org/ns/shacl-ui#`; later draft vocabulary can differ. Unknown constraints/editors are rejected by the demo profile. `sh:rootClass` is deliberately excluded because the original separate-graph tests expose an engine defect. The engine's package label `1.0.2` does **not** identify the experimental source; the immutable commit pin does.
@@ -98,7 +110,7 @@ See [support and experimental results](docs/support.md), [provenance](docs/prove
 
 - [SHACL Core](https://www.w3.org/TR/shacl12-core/)
 - [SHACL User Interfaces](https://www.w3.org/TR/shacl12-ui/)
-- [DASH vocabulary](https://datashapes.org/dash) — design reference, not a shipped renderer
+- [DASH form vocabulary](https://datashapes.org/forms.html) — bounded explicit viewer compatibility, not a full renderer
 - [CopilotKit source](https://github.com/CopilotKit/CopilotKit)
 - [AG-UI protocol](https://github.com/ag-ui-protocol/ag-ui)
 - [Pinned validator](https://github.com/rdf-ext/shacl-engine/tree/1d111fc772a71ec2118eed2974709c2b04f47510)
